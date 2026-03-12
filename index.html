@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Isip Ko, Mahal Ko — PH Mental Health Research</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <style>
+    /* ── THEME VARIABLES ── */
+    :root {
+      --cream: #fdf6ec;
+      --warm-white: #fffaf4;
+      --teal: #2a7c6f;
+      --teal-light: #3a9e8e;
+      --teal-pale: #e8f5f2;
+      --gold: #c9883a;
+      --gold-light: #f5dbb5;
+      --rust: #c45c3a;
+      --deep: #1a2e2b;
+      --text: #2c3e35;
+      --muted: #6b8077;
+      --border: #d8e8e4;
+      --card-bg: #fff;
+      --nav-bg: rgba(253,246,236,0.92);
+      --section-alt: #fffaf4;
+    }
+    [data-theme="dark"] {
+      --cream: #0f1f1c;
+      --warm-white: #121f1d;
+      --teal: #3ab89e;
+      --teal-light: #4ecfb5;
+      --teal-pale: #0d2e28;
+      --gold: #e0a84e;
+      --gold-light: #3a2e1a;
+      --rust: #d46b4a;
+      --deep: #e8f5f2;
+      --text: #d4e8e2;
+      --muted: #7aada0;
+      --border: #1e3d36;
+      --card-bg: #162420;
+      --nav-bg: rgba(15,31,28,0.95);
+      --section-alt: #121f1d;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ── LOADING SCREEN ── */
+    #loader {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--deep);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+    #loader.hidden { opacity: 0; visibility: hidden; }
+    .loader-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem; color: #fff;
+      animation: loaderPulse 1.5s ease infinite;
+    }
+    .loader-logo span { color: var(--gold); font-style: italic; }
+    .loader-tagline {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.85rem; margin-top: 0.8rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .loader-bar {
+      width: 200px; height: 3px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px; margin-top: 2rem; overflow: hidden;
+    }
+    .loader-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--teal), var(--gold));
+      border-radius: 10px;
+      animation: loaderFill 2s ease forwards;
+    }
+    @keyframes loaderPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(0.97); }
+    }
+    @keyframes loaderFill {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      background: var(--nav-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+      transition: background 0.3s;
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; color: var(--teal); font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .nav-logo span { color: var(--gold); font-style: italic; }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      text-decoration: none; color: var(--muted);
+      font-size: 0.88rem; font-weight: 500; letter-spacing: 0.03em;
+      text-transform: uppercase; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--teal); }
+    .nav-right { display: flex; align-items: center; gap: 0.7rem; }
+    .icon-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1rem;
+      transition: all 0.2s; color: var(--text);
+    }
+    .icon-btn:hover { background: var(--teal-pale); border-color: var(--teal); }
+    .lang-btn {
+      border: 1.5px solid var(--border);
+      background: transparent; color: var(--muted);
+      padding: 0.3rem 0.8rem; border-radius: 50px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; letter-spacing: 0.05em;
+    }
+    .lang-btn:hover { border-color: var(--teal); color: var(--teal); }
+    .nav-cta {
+      background: var(--teal); color: #fff;
+      border: none; padding: 0.55rem 1.3rem;
+      border-radius: 50px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .nav-cta:hover { background: var(--teal-light); transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 100px 5vw 60px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -20%; right: -10%;
+      width: 650px; height: 650px;
+      background: radial-gradient(circle, #c9e8e2 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+    [data-theme="dark"] .hero::before { background: radial-gradient(circle, rgba(42,124,111,0.2) 0%, transparent 70%); }
+    .hero::after {
+      content: '';
+      position: absolute; bottom: -15%; left: 30%;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, #f5dbb5 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+    [data-theme="dark"] .hero::after { background: radial-gradient(circle, rgba(201,136,58,0.15) 0%, transparent 70%); }
+    .hero-text { position: relative; z-index: 1; }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--teal-pale); border: 1px solid var(--border);
+      padding: 0.35rem 1rem; border-radius: 50px;
+      font-size: 0.78rem; font-weight: 600; color: var(--teal);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.8s ease both;
+    }
+    .hero-eyebrow::before { content: '🌿'; }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      line-height: 1.1; color: var(--deep);
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.8s 0.1s ease both;
+    }
+    h1 em { color: var(--teal); font-style: italic; }
+    h1 .gold { color: var(--gold); }
+    .hero-sub {
+      font-size: 1.05rem; line-height: 1.7; color: var(--muted);
+      max-width: 480px; margin-bottom: 2.5rem;
+      animation: fadeUp 0.8s 0.2s ease both;
+      font-weight: 300;
+    }
+    .hero-sub strong { color: var(--text); font-weight: 600; }
+    .hero-actions {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+    .btn-primary {
+      background: var(--teal); color: #fff;
+      padding: 0.85rem 2rem; border-radius: 50px;
+      font-weight: 600; font-size: 0.95rem;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: all 0.2s; display: inline-block;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-primary:hover { background: var(--teal-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(42,124,111,0.25); }
+    .btn-outline {
+      background: transparent; color: var(--teal);
+      padding: 0.85rem 2rem; border-radius: 50px;
+      font-weight: 600; font-size: 0.95rem;
+      text-decoration: none; border: 2px solid var(--teal);
+      cursor: pointer; transition: all 0.2s; display: inline-block;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-outline:hover { background: var(--teal-pale); }
+    .hero-stats {
+      display: flex; gap: 2.5rem; margin-top: 3rem;
+      padding-top: 2rem; border-top: 1px solid var(--border);
+      animation: fadeUp 0.8s 0.4s ease both;
+    }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 700; color: var(--teal);
+      transition: all 0.3s;
+    }
+    .stat-label { font-size: 0.82rem; color: var(--muted); margin-top: 0.2rem; }
+
+    .hero-visual {
+      position: relative; z-index: 1;
+      display: flex; justify-content: center; align-items: center;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+    .hero-card-stack { position: relative; width: 340px; height: 420px; }
+    .hcard {
+      position: absolute; border-radius: 20px;
+      padding: 1.8rem; box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+    }
+    .hcard-1 { background: var(--deep); color: #fff; width: 280px; top: 20px; left: 40px; transform: rotate(-4deg); }
+    [data-theme="dark"] .hcard-1 { background: #0a1a17; }
+    .hcard-2 { background: var(--card-bg); border: 1px solid var(--border); width: 280px; top: 60px; left: 20px; transform: rotate(2deg); }
+    .hcard-3 { background: var(--gold-light); width: 260px; top: 110px; left: 50px; transform: rotate(-1deg); }
+    .hcard-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+    .hcard-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .hcard-1 .hcard-title { color: #fff; }
+    .hcard-2 .hcard-title, .hcard-3 .hcard-title { color: var(--deep); }
+    .hcard-text { font-size: 0.82rem; line-height: 1.5; opacity: 0.75; }
+
+    /* ── SECTION SHARED ── */
+    section { padding: 90px 5vw; }
+    .section-label {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 0.8rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 3vw, 2.8rem);
+      line-height: 1.2; color: var(--deep); margin-bottom: 1rem;
+    }
+    .section-sub {
+      font-size: 1rem; color: var(--muted); max-width: 520px;
+      line-height: 1.7; font-weight: 300;
+    }
+
+    /* ── AWARENESS ── */
+    #awareness { background: var(--section-alt); }
+    .awareness-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem; margin-top: 3.5rem;
+    }
+    .awareness-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 2rem;
+      transition: transform 0.25s, box-shadow 0.25s;
+      position: relative; overflow: hidden;
+    }
+    .awareness-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 4px;
+    }
+    .awareness-card:nth-child(1)::before { background: var(--teal); }
+    .awareness-card:nth-child(2)::before { background: var(--gold); }
+    .awareness-card:nth-child(3)::before { background: var(--rust); }
+    .awareness-card:nth-child(4)::before { background: #7b68ee; }
+    .awareness-card:nth-child(5)::before { background: #e07b8a; }
+    .awareness-card:nth-child(6)::before { background: #4caf82; }
+    .awareness-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.08); }
+    .card-icon { font-size: 2rem; margin-bottom: 1rem; }
+    .card-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--deep); margin-bottom: 0.6rem; }
+    .card-text { font-size: 0.88rem; line-height: 1.6; color: var(--muted); }
+    .ph-note {
+      background: var(--teal-pale); border-left: 4px solid var(--teal);
+      padding: 1.2rem 1.5rem; border-radius: 0 12px 12px 0;
+      margin-top: 3rem; font-size: 0.92rem; color: var(--text); line-height: 1.6;
+    }
+    .ph-note strong { color: var(--teal); }
+
+    /* ── HOTLINES ── */
+    #resources { background: var(--deep); color: #fff; position: relative; overflow: hidden; }
+    [data-theme="dark"] #resources { background: #0a1a17; }
+    #resources::before {
+      content: ''; position: absolute; top: -50%; right: -20%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(42,124,111,0.3) 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none;
+    }
+    #resources .section-label { color: var(--gold); }
+    #resources .section-title { color: #fff; }
+    #resources .section-sub { color: rgba(255,255,255,0.6); }
+    .hotlines-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem; margin-top: 3rem; position: relative; z-index: 1;
+    }
+    .hotline-card {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px; padding: 1.6rem;
+      display: flex; gap: 1.2rem; align-items: flex-start;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .hotline-card:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+    .hotline-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: var(--teal); display: flex; align-items: center;
+      justify-content: center; font-size: 1.3rem; flex-shrink: 0;
+    }
+    .hotline-name { font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 0.3rem; }
+    .hotline-number { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--gold); display: block; margin-bottom: 0.3rem; }
+    .hotline-desc { font-size: 0.82rem; color: rgba(255,255,255,0.5); line-height: 1.4; }
+    .hotline-badge { display: inline-block; background: rgba(201,136,58,0.2); color: var(--gold); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 4px; margin-top: 0.4rem; }
+    .emergency-banner {
+      background: linear-gradient(135deg, var(--rust), #e07b4a);
+      border-radius: 16px; padding: 1.5rem 2rem;
+      display: flex; align-items: center; gap: 1.5rem;
+      margin-top: 1.2rem; position: relative; z-index: 1;
+    }
+    .emergency-banner .big-num { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 700; color: #fff; white-space: nowrap; }
+    .emergency-banner .em-text h3 { font-size: 1rem; font-weight: 700; color: #fff; }
+    .emergency-banner .em-text p { font-size: 0.85rem; color: rgba(255,255,255,0.75); margin-top: 0.2rem; }
+
+    /* ── SELF-CHECK QUIZ ── */
+    #quiz { background: var(--cream); }
+    .quiz-wrapper {
+      max-width: 680px; margin: 3rem auto 0;
+    }
+    .quiz-progress-wrap {
+      display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;
+    }
+    .quiz-step-label { font-size: 0.82rem; color: var(--muted); white-space: nowrap; }
+    .quiz-progress-bar {
+      flex: 1; height: 6px; background: var(--border);
+      border-radius: 10px; overflow: hidden;
+    }
+    .quiz-progress-fill {
+      height: 100%; background: linear-gradient(90deg, var(--teal), var(--gold));
+      border-radius: 10px; transition: width 0.4s ease;
+    }
+    .quiz-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 24px; padding: 2.5rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.05);
+      display: none;
+    }
+    .quiz-card.active { display: block; animation: fadeUp 0.4s ease both; }
+    .quiz-question {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; color: var(--deep);
+      margin-bottom: 0.5rem; line-height: 1.3;
+    }
+    .quiz-sub { font-size: 0.88rem; color: var(--muted); margin-bottom: 1.8rem; }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.7rem; }
+    .quiz-option {
+      background: var(--cream); border: 2px solid var(--border);
+      border-radius: 12px; padding: 1rem 1.2rem;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; gap: 0.8rem;
+      font-size: 0.92rem; color: var(--text);
+    }
+    .quiz-option:hover { border-color: var(--teal); background: var(--teal-pale); }
+    .quiz-option.selected { border-color: var(--teal); background: var(--teal-pale); color: var(--teal); font-weight: 600; }
+    .quiz-option-icon { font-size: 1.2rem; }
+    .quiz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; }
+    .quiz-back-btn {
+      background: transparent; border: 1.5px solid var(--border);
+      color: var(--muted); padding: 0.7rem 1.5rem;
+      border-radius: 50px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; transition: all 0.2s;
+    }
+    .quiz-back-btn:hover { border-color: var(--teal); color: var(--teal); }
+    .quiz-next-btn {
+      background: var(--teal); color: #fff;
+      border: none; padding: 0.7rem 2rem;
+      border-radius: 50px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; font-weight: 600; transition: all 0.2s;
+      opacity: 0.4; pointer-events: none;
+    }
+    .quiz-next-btn.enabled { opacity: 1; pointer-events: all; }
+    .quiz-next-btn.enabled:hover { background: var(--teal-light); transform: translateY(-1px); }
+
+    /* Quiz Result */
+    .quiz-result { display: none; text-align: center; }
+    .quiz-result.active { display: block; animation: fadeUp 0.5s ease both; }
+    .result-emoji { font-size: 4rem; margin-bottom: 1rem; }
+    .result-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--deep); margin-bottom: 0.5rem; }
+    .result-score-badge {
+      display: inline-block; padding: 0.4rem 1.2rem;
+      border-radius: 50px; font-size: 0.85rem; font-weight: 700;
+      margin-bottom: 1.2rem;
+    }
+    .result-desc { font-size: 0.95rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .result-tips {
+      background: var(--teal-pale); border-radius: 16px;
+      padding: 1.5rem; text-align: left; margin-bottom: 1.5rem;
+    }
+    .result-tips h4 { font-weight: 700; color: var(--teal); margin-bottom: 0.8rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .result-tips ul { list-style: none; }
+    .result-tips li { font-size: 0.88rem; color: var(--text); margin-bottom: 0.5rem; padding-left: 1.2rem; position: relative; }
+    .result-tips li::before { content: '✦'; position: absolute; left: 0; color: var(--teal); font-size: 0.6rem; top: 0.2rem; }
+    .quiz-retake-btn {
+      background: transparent; border: 2px solid var(--teal);
+      color: var(--teal); padding: 0.7rem 2rem;
+      border-radius: 50px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; font-weight: 600; transition: all 0.2s;
+    }
+    .quiz-retake-btn:hover { background: var(--teal-pale); }
+
+    /* ── DASHBOARD ── */
+    #dashboard { background: var(--section-alt); }
+    .dashboard-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .dash-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 20px; padding: 1.8rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+    }
+    .dash-card.wide { grid-column: span 2; }
+    .dash-card.full { grid-column: span 3; }
+    .dash-card-title {
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 1.2rem;
+    }
+    .dash-big-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem; font-weight: 700; color: var(--teal);
+    }
+    .dash-big-label { font-size: 0.85rem; color: var(--muted); margin-top: 0.3rem; }
+    .dash-trend {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      background: rgba(42,124,111,0.1); color: var(--teal);
+      font-size: 0.78rem; font-weight: 600;
+      padding: 0.2rem 0.6rem; border-radius: 4px; margin-top: 0.5rem;
+    }
+    .chart-wrap { position: relative; height: 200px; }
+    .dash-disclaimer { font-size: 0.75rem; color: var(--muted); margin-top: 1rem; text-align: center; font-style: italic; }
+
+    /* ── SURVEY ── */
+    #survey { background: var(--cream); }
+    .survey-wrapper {
+      display: grid; grid-template-columns: 1fr 1.4fr;
+      gap: 5rem; align-items: start; margin-top: 3rem;
+    }
+    .survey-info h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--deep); margin-bottom: 1rem; }
+    .survey-info p { font-size: 0.9rem; line-height: 1.7; color: var(--muted); margin-bottom: 1.5rem; }
+    .survey-perks { list-style: none; }
+    .survey-perks li { display: flex; gap: 0.8rem; align-items: flex-start; font-size: 0.88rem; color: var(--text); margin-bottom: 0.7rem; }
+    .perk-dot { width: 22px; height: 22px; border-radius: 50%; background: var(--teal-pale); border: 2px solid var(--teal); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.7rem; }
+
+    /* Survey Progress Bar */
+    .survey-progress-wrap {
+      margin-bottom: 1.8rem;
+    }
+    .survey-progress-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .survey-progress-label { font-size: 0.82rem; color: var(--muted); }
+    .survey-progress-pct { font-size: 0.82rem; font-weight: 700; color: var(--teal); }
+    .survey-progress-bar {
+      height: 6px; background: var(--border);
+      border-radius: 10px; overflow: hidden;
+    }
+    .survey-progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--teal), var(--gold));
+      border-radius: 10px; transition: width 0.4s ease;
+    }
+
+    .survey-form {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 24px; padding: 2.5rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.05);
+    }
+    .form-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--deep); margin-bottom: 0.3rem; }
+    .form-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; }
+    .form-group { margin-bottom: 1.4rem; }
+    .form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+    .form-label span { color: var(--rust); }
+    .form-input, .form-select, .form-textarea {
+      width: 100%; padding: 0.75rem 1rem;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+      color: var(--text); background: var(--cream);
+      transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--teal); box-shadow: 0 0 0 3px rgba(42,124,111,0.1);
+    }
+    .form-textarea { min-height: 90px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .radio-group { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .radio-label {
+      display: flex; align-items: center; gap: 0.4rem;
+      background: var(--cream); border: 1.5px solid var(--border);
+      border-radius: 8px; padding: 0.5rem 0.9rem;
+      font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+    }
+    .radio-label:hover { border-color: var(--teal); background: var(--teal-pale); }
+    .radio-label input { display: none; }
+    .radio-label.selected { border-color: var(--teal); background: var(--teal-pale); color: var(--teal); font-weight: 600; }
+    .scale-group { display: flex; gap: 0.4rem; }
+    .scale-btn {
+      flex: 1; padding: 0.6rem; border: 1.5px solid var(--border);
+      border-radius: 8px; background: var(--cream); cursor: pointer;
+      font-size: 0.85rem; font-weight: 600; text-align: center;
+      transition: all 0.2s; font-family: 'DM Sans', sans-serif; color: var(--text);
+    }
+    .scale-btn:hover { border-color: var(--teal); background: var(--teal-pale); }
+    .scale-btn.active { border-color: var(--teal); background: var(--teal); color: #fff; }
+    .scale-labels { display: flex; justify-content: space-between; margin-top: 0.3rem; font-size: 0.73rem; color: var(--muted); }
+    .consent-box {
+      background: var(--teal-pale); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1rem; font-size: 0.82rem;
+      color: var(--muted); line-height: 1.5; margin-bottom: 1.4rem;
+    }
+    .consent-check { display: flex; gap: 0.6rem; align-items: flex-start; margin-top: 0.8rem; }
+    .consent-check input { margin-top: 2px; accent-color: var(--teal); }
+    .submit-btn {
+      width: 100%; padding: 1rem; background: var(--teal);
+      color: #fff; border: none; border-radius: 50px;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem;
+      font-weight: 700; cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em;
+    }
+    .submit-btn:hover { background: var(--teal-light); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(42,124,111,0.25); }
+    .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+    .success-msg { display: none; text-align: center; padding: 2.5rem 1rem; }
+    .success-msg .big-check { font-size: 3.5rem; margin-bottom: 1rem; }
+    .success-msg h3 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--deep); margin-bottom: 0.5rem; }
+    .success-msg p { font-size: 0.9rem; color: var(--muted); }
+
+    /* ── TICKER ── */
+    .ticker-wrap { background: var(--teal); overflow: hidden; padding: 0.75rem 0; }
+    .ticker-track { display: flex; gap: 3rem; animation: ticker 30s linear infinite; white-space: nowrap; }
+    .ticker-item { font-size: 0.85rem; font-weight: 500; color: #fff; display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
+    .ticker-item::before { content: '✦'; color: var(--gold); }
+
+    /* ── FOOTER ── */
+    footer { background: var(--deep); color: rgba(255,255,255,0.5); padding: 3rem 5vw; text-align: center; }
+    [data-theme="dark"] footer { background: #0a1a17; }
+    footer .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #fff; margin-bottom: 0.5rem; }
+    footer p { font-size: 0.82rem; line-height: 1.6; max-width: 480px; margin: 0 auto; }
+    footer .disclaimer { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.78rem; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding: 100px 5vw 60px; }
+      .hero-visual { display: none; }
+      .awareness-grid { grid-template-columns: 1fr 1fr; }
+      .hotlines-grid { grid-template-columns: 1fr; }
+      .survey-wrapper { grid-template-columns: 1fr; gap: 2.5rem; }
+      .nav-links { display: none; }
+      .form-row { grid-template-columns: 1fr; }
+      .dashboard-grid { grid-template-columns: 1fr 1fr; }
+      .dash-card.wide { grid-column: span 2; }
+      .dash-card.full { grid-column: span 2; }
+    }
+    @media (max-width: 600px) {
+      .awareness-grid { grid-template-columns: 1fr; }
+      .hero-stats { gap: 1.5rem; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .dash-card.wide, .dash-card.full { grid-column: span 1; }
+      .lang-btn { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loader">
+  <div class="loader-logo">Isip <span>Ko,</span> Mahal Ko</div>
+  <div class="loader-tagline">PH Mental Health Research 2025</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Isip <span>Ko,</span> Mahal Ko</div>
+  <ul class="nav-links">
+    <li><a href="#awareness" data-en="Awareness" data-fil="Kamalayan">Awareness</a></li>
+    <li><a href="#resources" data-en="Resources" data-fil="Tulong">Resources</a></li>
+    <li><a href="#quiz" data-en="Self-Check" data-fil="Suriin Sarili">Self-Check</a></li>
+    <li><a href="#dashboard" data-en="Results" data-fil="Resulta">Results</a></li>
+    <li><a href="#survey" data-en="Survey" data-fil="Sarbey">Survey</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="lang-btn" onclick="toggleLang()" id="langBtn">🇵🇭 Filipino</button>
+    <button class="icon-btn" onclick="toggleDark()" id="darkBtn" title="Toggle dark mode">🌙</button>
+    <button class="nav-cta" onclick="document.getElementById('survey').scrollIntoView({behavior:'smooth'})" data-en="Join the Study" data-fil="Sumali sa Pag-aaral">Join the Study</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-text">
+    <div class="hero-eyebrow" data-en="Psychology Research • Philippines 2025" data-fil="Pananaliksik sa Sikolohiya • Pilipinas 2025">Psychology Research • Philippines 2025</div>
+    <h1>Your <em>isip</em> matters.<br>So does your <span class="gold">kalusugan.</span></h1>
+    <p class="hero-sub">
+      A psychology research initiative exploring <strong>mental health & well-being</strong> among Filipinos — raising awareness, connecting communities to local support, and gathering insights that can help shape a mentally healthier Philippines.
+    </p>
+    <div class="hero-actions">
+      <a href="#survey" class="btn-primary" data-en="Take the Survey" data-fil="Sumagot sa Sarbey">Take the Survey</a>
+      <a href="#resources" class="btn-outline" data-en="Find Help Now" data-fil="Humanap ng Tulong">Find Help Now</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num" data-count="1in5">1 in 5</div>
+        <div class="stat-label" data-en="Filipinos experience<br>mental health issues" data-fil="Mga Pilipino ang may<br>karamdamang pangkaisipan">Filipinos experience<br>mental health issues</div>
+      </div>
+      <div>
+        <div class="stat-num" data-count="3">3%</div>
+        <div class="stat-label" data-en="Only 3% seek<br>professional help" data-fil="3% lamang ang<br>humuhugi ng tulong">Only 3% seek<br>professional help</div>
+      </div>
+      <div>
+        <div class="stat-num" data-count="7641">7,641</div>
+        <div class="stat-label" data-en="Islands — one shared<br>conversation to start" data-fil="Isla — isang usapan<br>para magsimula">Islands — one shared<br>conversation to start</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-card-stack">
+      <div class="hcard hcard-1">
+        <div class="hcard-icon">🧠</div>
+        <div class="hcard-title">Mental Wellness Matters</div>
+        <div class="hcard-text">Kalusugang pangkaisipan ay kalusugan din.</div>
+      </div>
+      <div class="hcard hcard-2">
+        <div class="hcard-icon">🌿</div>
+        <div class="hcard-title">You Are Not Alone</div>
+        <div class="hcard-text">Help is available — right here, in your community.</div>
+      </div>
+      <div class="hcard hcard-3">
+        <div class="hcard-icon">📊</div>
+        <div class="hcard-title">Your Voice Counts</div>
+        <div class="hcard-text">Every response shapes a brighter future for PH mental health.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span class="ticker-item">Mental health is a right, not a privilege</span>
+    <span class="ticker-item">Huwag mahiyang humingi ng tulong</span>
+    <span class="ticker-item">RA 11036 — Mental Health Act of the Philippines</span>
+    <span class="ticker-item">Talking about mental health saves lives</span>
+    <span class="ticker-item">Kalusugang pangkaisipan ay kasinghalaga ng pisikal</span>
+    <span class="ticker-item">You deserve support and healing</span>
+    <span class="ticker-item">Mental health is a right, not a privilege</span>
+    <span class="ticker-item">Huwag mahiyang humingi ng tulong</span>
+    <span class="ticker-item">RA 11036 — Mental Health Act of the Philippines</span>
+    <span class="ticker-item">Talking about mental health saves lives</span>
+    <span class="ticker-item">Kalusugang pangkaisipan ay kasinghalaga ng pisikal</span>
+    <span class="ticker-item">You deserve support and healing</span>
+  </div>
+</div>
+
+<!-- AWARENESS -->
+<section id="awareness">
+  <div class="section-label" data-en="Mental Health Awareness" data-fil="Kamalayan sa Kalusugang Pangkaisipan">Mental Health Awareness</div>
+  <h2 class="section-title">Understanding Your <em style="font-family:'Playfair Display',serif; color:var(--teal);">Isip</em></h2>
+  <p class="section-sub" data-en="Mental health affects how we think, feel, and act — and it shapes our daily lives as Filipinos navigating work, family, and community." data-fil="Ang kalusugang pangkaisipan ay nakakaapekto sa ating pag-iisip, damdamin, at kilos — at humuhubog sa ating pang-araw-araw na buhay bilang mga Pilipino.">Mental health affects how we think, feel, and act — and it shapes our daily lives as Filipinos navigating work, family, and community.</p>
+  <div class="awareness-grid">
+    <div class="awareness-card">
+      <div class="card-icon">😔</div>
+      <div class="card-title" data-en="Depression" data-fil="Depresyon">Depression</div>
+      <div class="card-text" data-en='Characterized by persistent sadness, loss of interest, and low energy. In Filipino culture, often dismissed as "tamad lang" — but it is a real, treatable condition.' data-fil='Nailalarawan sa patuloy na kalungkutan, kawalan ng interes, at mababang lakas. Sa kulturang Pilipino, madalas itong itinatangi bilang "tamad lang" — ngunit ito ay tunay na kondisyon na maaaring gamutin.'>Characterized by persistent sadness, loss of interest, and low energy. In Filipino culture, often dismissed as "tamad lang" — but it is a real, treatable condition.</div>
+    </div>
+    <div class="awareness-card">
+      <div class="card-icon">😰</div>
+      <div class="card-title" data-en="Anxiety" data-fil="Pagkabalisa">Anxiety</div>
+      <div class="card-text" data-en="Excessive worry, restlessness, and fear that disrupts daily life. Common among Filipino students and OFWs navigating pressure and separation." data-fil="Labis na pag-aalala, kakulangan sa pahinga, at takot na nakakagambala sa pang-araw-araw na buhay. Karaniwan sa mga estudyanteng Pilipino at OFW.">Excessive worry, restlessness, and fear that disrupts daily life. Common among Filipino students and OFWs navigating pressure and separation.</div>
+    </div>
+    <div class="awareness-card">
+      <div class="card-icon">🔥</div>
+      <div class="card-title" data-en="Burnout" data-fil="Pagod na Pagod">Burnout</div>
+      <div class="card-text" data-en='"Pagod na pagod na ako" — burnout is not just tiredness. It erodes motivation, identity, and one\'s sense of purpose over time.' data-fil='"Pagod na pagod na ako" — ang burnout ay hindi lang pagod. Unti-unting sinisira nito ang motibasyon, pagkakakilanlan, at layunin sa buhay.'>"Pagod na pagod na ako" — burnout is not just tiredness. It erodes motivation, identity, and one's sense of purpose over time.</div>
+    </div>
+    <div class="awareness-card">
+      <div class="card-icon">🌀</div>
+      <div class="card-title" data-en="Trauma & PTSD" data-fil="Trauma at PTSD">Trauma & PTSD</div>
+      <div class="card-text" data-en="The Philippines is frequently affected by typhoons, disasters, and violence. Trauma can resurface years later through flashbacks and emotional numbness." data-fil="Madalas na tinatamaan ng bagyo, sakuna, at karahasan ang Pilipinas. Ang trauma ay maaaring bumalik pagkaraan ng maraming taon.">The Philippines is frequently affected by typhoons, disasters, and violence. Trauma can resurface years later through flashbacks and emotional numbness.</div>
+    </div>
+    <div class="awareness-card">
+      <div class="card-icon">💔</div>
+      <div class="card-title" data-en="Suicidal Ideation" data-fil="Pag-iisip ng Pag-aalis ng Buhay">Suicidal Ideation</div>
+      <div class="card-text" data-en='Thoughts of self-harm or suicide require immediate support. Stigma prevents many Filipinos from speaking up. "Kamusta ka talaga?" can be life-saving.' data-fil='Ang mga pag-iisip ng pag-aalis ng sariling buhay ay nangangailangan ng agarang tulong. Ang stigma ay pumipigil sa maraming Pilipino. Ang "Kamusta ka talaga?" ay maaaring magligtas ng buhay.'>Thoughts of self-harm or suicide require immediate support. Stigma prevents many Filipinos from speaking up. "Kamusta ka talaga?" can be life-saving.</div>
+    </div>
+    <div class="awareness-card">
+      <div class="card-icon">🌱</div>
+      <div class="card-title" data-en="Pathways to Healing" data-fil="Landas Patungo sa Kagalingan">Pathways to Healing</div>
+      <div class="card-text" data-en="Recovery is possible through therapy, medication, peer support, and community. The Philippines' Mental Health Act (RA 11036) mandates accessible mental health services." data-fil="Ang paggaling ay posible sa pamamagitan ng therapy, gamot, suporta ng kapwa, at komunidad. Inuutos ng RA 11036 ang mga accessible na serbisyo sa kalusugang pangkaisipan.">Recovery is possible through therapy, medication, peer support, and community. The Philippines' Mental Health Act (RA 11036) mandates accessible mental health services.</div>
+    </div>
+  </div>
+  <div class="ph-note">
+    <strong>🇵🇭 Did you know?</strong> The Philippines passed the <strong>Mental Health Act (RA 11036)</strong> in 2018, mandating mental health services in all government hospitals and schools. Yet awareness and access remain major barriers — especially in provinces. This research aims to bridge that gap.
+  </div>
+</section>
+
+<!-- HOTLINES -->
+<section id="resources">
+  <div class="section-label" data-en="Local Resources & Hotlines" data-fil="Lokal na Tulong at Hotlines">Local Resources & Hotlines</div>
+  <h2 class="section-title" data-en="Help is One Call Away" data-fil="Isang Tawag Lang ang Tulong">Help is One Call Away</h2>
+  <p class="section-sub" data-en="Free, confidential mental health support from trusted Philippine organizations. Huwag mag-atubiling tumawag." data-fil="Libreng, kumpidensyal na suporta sa kalusugang pangkaisipan mula sa mga pinagkakatiwalaang organisasyon. Huwag mag-atubiling tumawag.">Free, confidential mental health support from trusted Philippine organizations. Huwag mag-atubiling tumawag — you don't have to face this alone.</p>
+  <div class="hotlines-grid">
+    <div class="hotline-card"><div class="hotline-icon">☎️</div><div><div class="hotline-name">NCMH Crisis Hotline</div><span class="hotline-number">1553</span><div class="hotline-desc">National Center for Mental Health — free, 24/7 crisis intervention for anyone in distress.</div><span class="hotline-badge">24 / 7 · Free</span></div></div>
+    <div class="hotline-card"><div class="hotline-icon">🌸</div><div><div class="hotline-name">Hopeline Philippines</div><span class="hotline-number">0917-558-4673</span><div class="hotline-desc">Natasha Goulbourn Foundation crisis line. Also reachable at (02) 8804-4673. Suicide prevention focus.</div><span class="hotline-badge">Crisis Support</span></div></div>
+    <div class="hotline-card"><div class="hotline-icon">🤝</div><div><div class="hotline-name">In Touch Community Services</div><span class="hotline-number">0917-800-1123</span><div class="hotline-desc">Multilingual crisis line (English & Filipino). Also reachable at (02) 8893-7603.</div><span class="hotline-badge">Multilingual</span></div></div>
+    <div class="hotline-card"><div class="hotline-icon">🏥</div><div><div class="hotline-name">DOH Mental Health Support</div><span class="hotline-number">1800-1888-1553</span><div class="hotline-desc">Department of Health free hotline for mental health guidance and referrals. Toll-free nationwide.</div><span class="hotline-badge">Toll-Free · Nationwide</span></div></div>
+    <div class="hotline-card"><div class="hotline-icon">📱</div><div><div class="hotline-name">iCall Philippines</div><span class="hotline-number">0966-351-4519</span><div class="hotline-desc">Psychosocial support helpline offering counseling and mental health first aid referrals.</div><span class="hotline-badge">Counseling</span></div></div>
+    <div class="hotline-card"><div class="hotline-icon">🎓</div><div><div class="hotline-name">University Guidance Offices</div><span class="hotline-number">Check Your School</span><div class="hotline-desc">DepEd and CHED-mandated guidance counselors available in all schools. Free and confidential.</div><span class="hotline-badge">Students · Free</span></div></div>
+  </div>
+  <div class="emergency-banner">
+    <div class="big-num">911</div>
+    <div class="em-text"><h3>Emergency? Call 911 immediately.</h3><p>If someone is in immediate danger or has harmed themselves, call 911 or go to the nearest emergency room without delay.</p></div>
+  </div>
+</section>
+
+<!-- SELF-CHECK QUIZ -->
+<section id="quiz">
+  <div class="section-label" data-en="Interactive Self-Check" data-fil="Interaktibong Pagsusuri">Interactive Self-Check</div>
+  <h2 class="section-title" data-en="How Are You <em style='font-family:Playfair Display,serif;color:var(--teal);font-style:italic;'>Really</em> Feeling?" data-fil="Paano Ka <em style='font-family:Playfair Display,serif;color:var(--teal);font-style:italic;'>Tunay na</em> Nakakaramdam?">How Are You <em style="font-family:'Playfair Display',serif;color:var(--teal);font-style:italic;">Really</em> Feeling?</h2>
+  <p class="section-sub" data-en="This quick 5-question check-in gives you a personalized snapshot of your mental well-being. It is not a clinical diagnosis — just a gentle reflection." data-fil="Ang maikling 5-tanong na pagsusuri na ito ay nagbibigay ng personalisadong larawan ng iyong kalusugang pangkaisipan. Hindi ito klinikal na diagnosis — isang malambot na repleksyon lamang.">This quick 5-question check-in gives you a personalized snapshot of your mental well-being. It is not a clinical diagnosis — just a gentle reflection.</p>
+
+  <div class="quiz-wrapper">
+    <!-- Progress -->
+    <div class="quiz-progress-wrap">
+      <span class="quiz-step-label" id="quizStepLabel">Question 1 of 5</span>
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quizProgressFill" style="width:20%"></div></div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="quiz-card active" id="qcard1">
+      <div class="quiz-question">Over the past week, how often have you felt sad, empty, or hopeless?</div>
+      <div class="quiz-sub">Isang linggo na ang nakalipas — paano mo nararamdaman?</div>
+      <div class="quiz-options">
+        <div class="quiz-option" onclick="selectQuiz(this, 1, 0)"><span class="quiz-option-icon">😊</span> Rarely or not at all</div>
+        <div class="quiz-option" onclick="selectQuiz(this, 1, 1)"><span class="quiz-option-icon">😐</span> A few days</div>
+        <div class="quiz-option" onclick="selectQuiz(this, 1, 2)"><span class="quiz-option-icon">😔</span> More than half the days</div>
+        <div class="quiz-option" onclick="selectQuiz(this, 1, 3)"><span class="quiz-option-icon">😢</span> Nearly every day</div>
+      </div>
+      <div class="quiz-nav">
+        <div></div>
+        <button class="quiz-next-btn" id="qnext1" onclick="quizNext(1)">Next →</button>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-card" id="qcard2">
+      <div class="quiz-question">How often do you feel nervous, anxious, or on edge?</div>
+      <div class="quiz-sub">Gaano kadalas kang makaramdam ng pagkabalisa?</div>
+      <div class="quiz-options">
+        <div class="quiz-option" onclick="selectQuiz(this, 2, 0)"><span class="quiz-option-icon">😌</span> Rarely or not at all</div>
+        <div class="quiz-option" onclick="selectQuiz(this, 2, 1)"><span class="quiz-option-icon">🙂</span> A few days</div>
+        <div class="quiz-option" onclick="selectQuiz(this, 2, 2)"><span class="quiz-option-icon">😟</span> More than half the days</div>
+        <div class="quiz-option" onclick="selectQuiz(this, 2, 3)"><span class="quiz-option-icon">😰</span> Nearly every day</div>
+      </div>
+      <div class="quiz-nav">
+        <button class="quiz-back-btn" onclick="quizBack(2)">← Back</button>
+        <button class="quiz-next-btn" id="qnext2" onclick="quizNext(2)">Next →</button>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-card" id="qcard3">
+      <div class="quiz-question">How would you rate your energy and motivation lately?</div>
+      <div class="quiz-sub">Paano mo ilarawan ang iyong lakas at motibasyon ngayon?</div>
+      <div class="quiz-options">
+        <div class="quiz-option" onclick="selectQuiz(this, 3, 0)"><span class="quiz-option-icon">⚡</span> I feel energized and motivated</div>
+        <div class="quiz-option" onclick="selectQuiz(this, 3, 1)"><span class="quiz-option-icon">🔋</span> Okay — some good and bad days</div>
+        <div class="quiz-option" onclick="selectQuiz(this, 3, 2)"><span class="quiz-option-icon">😴</span> I often feel tired and unmotivated</div>
+        <div class="quiz-option" onclick="selectQuiz(this, 3, 3)"><span class="quiz-option-icon">🪫</span> Completely drained — hard to function</div>
+      </div>
+      <div class="quiz-nav">
+        <button class="quiz-back-btn" onclick="quizBack(3)">← Back</button>
+        <button class="quiz-next-btn" id="qnext3" onclick="quizNext(3)">Next →</button>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-card" id="qcard4">
+      <div class="quiz-question">Do you have people in your life you can talk to when things get hard?</div>
+      <div class="quiz-sub">Mayroon ka bang taong maaaring kausapin sa mga mahirap na sandali?</div>
+      <div class="quiz-options">
+        <div class="quiz-option" onclick="selectQuiz(this, 4, 0)"><span class="quiz-option-icon">🤗</span> Yes, I have strong support around me</div>
+        <div class="quiz-option" onclick="selectQuiz(this, 4, 1)"><span class="quiz-option-icon">🙏</span> A few people, but it's limited</div>
+        <div class="quiz-option" onclick="selectQuiz(this, 4, 2)"><span class="quiz-option-icon">🤐</span> I find it hard to open up</div>
+        <div class="quiz-option" onclick="selectQuiz(this, 4, 3)"><span class="quiz-option-icon">😶</span> I feel alone and unsupported</div>
+      </div>
+      <div class="quiz-nav">
+        <button class="quiz-back-btn" onclick="quizBack(4)">← Back</button>
+        <button class="quiz-next-btn" id="qnext4" onclick="quizNext(4)">Next →</button>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-card" id="qcard5">
+      <div class="quiz-question">How are you sleeping and taking care of yourself?</div>
+      <div class="quiz-sub">Paano ang iyong tulog at pag-aalaga sa sarili?</div>
+      <div class="quiz-options">
+        <div class="quiz-option" onclick="selectQuiz(this, 5, 0)"><span class="quiz-option-icon">🌙</span> Sleeping well, taking care of myself</div>
+        <div class="quiz-option" onclick="selectQuiz(this, 5, 1)"><span class="quiz-option-icon">😪</span> Sleep is inconsistent but manageable</div>
+        <div class="quiz-option" onclick="selectQuiz(this, 5, 2)"><span class="quiz-option-icon">😩</span> Poor sleep, neglecting self-care</div>
+        <div class="quiz-option" onclick="selectQuiz(this, 5, 3)"><span class="quiz-option-icon">🛌</span> Very poor sleep, struggling significantly</div>
+      </div>
+      <div class="quiz-nav">
+        <button class="quiz-back-btn" onclick="quizBack(5)">← Back</button>
+        <button class="quiz-next-btn" id="qnext5" onclick="showQuizResult()">See My Result →</button>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="quiz-card quiz-result" id="qresult">
+      <div class="result-emoji" id="resultEmoji">🌿</div>
+      <div class="result-title" id="resultTitle">You're doing well!</div>
+      <div class="result-score-badge" id="resultBadge"></div>
+      <div class="result-desc" id="resultDesc"></div>
+      <div class="result-tips" id="resultTips"></div>
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem;">⚠️ This is not a clinical diagnosis. If you are struggling, please reach out to a professional.</p>
+      <button class="quiz-retake-btn" onclick="retakeQuiz()">Retake Quiz</button>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE DASHBOARD -->
+<section id="dashboard">
+  <div class="section-label" data-en="Research Dashboard" data-fil="Dashboard ng Pananaliksik">Research Dashboard</div>
+  <h2 class="section-title" data-en="Live Response Insights" data-fil="Mga Natuklasang Sagot">Live Response Insights</h2>
+  <p class="section-sub" data-en="A snapshot of what Filipino respondents are sharing about their mental health. Data updates as new responses come in." data-fil="Isang larawan ng ibinahagi ng mga Pilipinong sumasagot tungkol sa kanilang kalusugang pangkaisipan.">A snapshot of what Filipino respondents are sharing about their mental health. Data updates as new responses come in.</p>
+
+  <div class="dashboard-grid">
+    <div class="dash-card">
+      <div class="dash-card-title">Total Responses</div>
+      <div class="dash-big-num" id="totalResponses">0</div>
+      <div class="dash-big-label">Filipinos surveyed</div>
+      <div class="dash-trend">↑ Growing</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-title">Avg. Well-Being Score</div>
+      <div class="dash-big-num" id="avgWellbeing">—</div>
+      <div class="dash-big-label">out of 10</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-title">Most Common Challenge</div>
+      <div class="dash-big-num" style="font-size:2rem;" id="topChallenge">—</div>
+      <div class="dash-big-label" id="topChallengeLabel">reported by respondents</div>
+    </div>
+    <div class="dash-card wide">
+      <div class="dash-card-title">Stress Frequency Distribution</div>
+      <div class="chart-wrap"><canvas id="stressChart"></canvas></div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-title">Help-Seeking Behavior</div>
+      <div class="chart-wrap"><canvas id="helpChart"></canvas></div>
+    </div>
+    <div class="dash-card full">
+      <div class="dash-card-title">Top Barriers to Seeking Help</div>
+      <div class="chart-wrap" style="height:180px;"><canvas id="barrierChart"></canvas></div>
+    </div>
+  </div>
+  <div class="dash-disclaimer">📊 Dashboard reflects aggregated, anonymous survey responses. Sample data shown until sufficient responses are collected.</div>
+</section>
+
+<!-- SURVEY -->
+<section id="survey">
+  <div class="section-label" data-en="Research Survey" data-fil="Sarbey ng Pananaliksik">Research Survey</div>
+  <h2 class="section-title" data-en="Share Your Experience" data-fil="Ibahagi ang Iyong Karanasan">Share Your Experience</h2>
+  <p class="section-sub" data-en="Your responses will contribute to psychology research on Filipino mental health and well-being. All answers are anonymous and confidential." data-fil="Ang iyong mga sagot ay mag-aambag sa pananaliksik sa sikolohiya. Lahat ng sagot ay anonymous at kumpidensyal.">Your responses will contribute to psychology research on Filipino mental health and well-being. All answers are anonymous and confidential.</p>
+
+  <div class="survey-wrapper">
+    <div class="survey-info">
+      <h3 data-en="Why Your Voice Matters" data-fil="Bakit Mahalaga ang Iyong Boses">Why Your Voice Matters</h3>
+      <p data-en="This study explores the mental health landscape of Filipinos — understanding what we struggle with, how we cope, and what barriers prevent us from seeking help." data-fil="Sinasaliksik ng pag-aaral na ito ang kalusugang pangkaisipan ng mga Pilipino — upang maunawaan ang ating mga hamon, kung paano tayo nakayanan, at kung ano ang pumipigil sa atin.">This study explores the mental health landscape of Filipinos — understanding what we struggle with, how we cope, and what barriers prevent us from seeking help.</p>
+      <p data-en="The findings will be used to develop recommendations for better mental health support systems in the Philippines, tailored to our unique cultural context." data-fil="Ang mga natuklasan ay gagamitin upang bumuo ng mga rekomendasyon para sa mas magandang sistema ng suporta sa kalusugang pangkaisipan sa Pilipinas.">The findings will be used to develop recommendations for better mental health support systems in the Philippines, tailored to our unique cultural context.</p>
+      <ul class="survey-perks">
+        <li><div class="perk-dot">✓</div><span data-en="Completely anonymous — no personal identifiers collected" data-fil="Ganap na anonymous — walang personal na impormasyon">Completely anonymous — no personal identifiers collected</span></li>
+        <li><div class="perk-dot">✓</div><span data-en="Takes only 5–7 minutes to complete" data-fil="5–7 minuto lamang ang sagutan">Takes only 5–7 minutes to complete</span></li>
+        <li><div class="perk-dot">✓</div><span data-en="Results will be shared with local health advocates" data-fil="Ibabahagi ang resulta sa mga lokal na tagapagtaguyod">Results will be shared with local health advocates</span></li>
+        <li><div class="perk-dot">✓</div><span data-en="Contributes to RA 11036 implementation efforts" data-fil="Nag-aambag sa pagsasakatuparan ng RA 11036">Contributes to RA 11036 implementation efforts</span></li>
+        <li><div class="perk-dot">✓</div><span data-en="Open to all Filipinos — students and general public" data-fil="Bukas sa lahat ng Pilipino — estudyante at pangkalahatang publiko">Open to all Filipinos — students and general public</span></li>
+      </ul>
+    </div>
+
+    <div class="survey-form" id="surveyForm">
+      <div class="form-title" data-en="Mental Well-Being Survey" data-fil="Sarbey sa Kalusugang Pangkaisipan">Mental Well-Being Survey</div>
+      <div class="form-sub">Psychology Research · Confidential · Anonymous</div>
+
+      <!-- Survey Progress Bar -->
+      <div class="survey-progress-wrap">
+        <div class="survey-progress-header">
+          <span class="survey-progress-label" data-en="Survey completion" data-fil="Pagkumpleto ng sarbey">Survey completion</span>
+          <span class="survey-progress-pct" id="surveyPct">0%</span>
+        </div>
+        <div class="survey-progress-bar">
+          <div class="survey-progress-fill" id="surveyProgressFill"></div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" data-en="Age Group" data-fil="Pangkat ng Edad">Age Group <span>*</span></label>
+          <select class="form-select" id="q_age" required onchange="updateSurveyProgress()">
+            <option value="">Select age</option>
+            <option>15–17</option><option>18–24</option><option>25–34</option>
+            <option>35–44</option><option>45–54</option><option>55+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-en="Region / Province" data-fil="Rehiyon / Probinsya">Region / Province <span>*</span></label>
+          <select class="form-select" id="q_region" required onchange="updateSurveyProgress()">
+            <option value="">Select region</option>
+            <option>NCR (Metro Manila)</option><option>CAR</option>
+            <option>Ilocos Region (Region I)</option><option>Cagayan Valley (Region II)</option>
+            <option>Central Luzon (Region III)</option><option>CALABARZON (Region IV-A)</option>
+            <option>MIMAROPA (Region IV-B)</option><option>Bicol Region (Region V)</option>
+            <option>Western Visayas (Region VI)</option><option>Central Visayas (Region VII)</option>
+            <option>Eastern Visayas (Region VIII)</option><option>Zamboanga Peninsula (Region IX)</option>
+            <option>Northern Mindanao (Region X)</option><option>Davao Region (Region XI)</option>
+            <option>SOCCSKSARGEN (Region XII)</option><option>Caraga (Region XIII)</option><option>BARMM</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-en="Current Status" data-fil="Kasalukuyang Katayuan">Current Status <span>*</span></label>
+        <div class="radio-group" id="q_status">
+          <label class="radio-label"><input type="radio" name="status" value="Student" onchange="updateSurveyProgress()"> 🎓 Student</label>
+          <label class="radio-label"><input type="radio" name="status" value="Employed" onchange="updateSurveyProgress()"> 💼 Employed</label>
+          <label class="radio-label"><input type="radio" name="status" value="Unemployed" onchange="updateSurveyProgress()"> 🏠 Unemployed</label>
+          <label class="radio-label"><input type="radio" name="status" value="OFW" onchange="updateSurveyProgress()"> ✈️ OFW</label>
+          <label class="radio-label"><input type="radio" name="status" value="Other" onchange="updateSurveyProgress()"> 🌐 Other</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-en="How would you rate your overall mental well-being right now?" data-fil="Paano mo irereyta ang iyong kabuuang kalusugang pangkaisipan ngayon?">How would you rate your overall mental well-being right now? <span>*</span></label>
+        <div class="scale-group" id="q_wellbeing">
+          <button type="button" class="scale-btn" onclick="setScale(this,'q_wellbeing','1')">1</button>
+          <button type="button" class="scale-btn" onclick="setScale(this,'q_wellbeing','2')">2</button>
+          <button type="button" class="scale-btn" onclick="setScale(this,'q_wellbeing','3')">3</button>
+          <button type="button" class="scale-btn" onclick="setScale(this,'q_wellbeing','4')">4</button>
+          <button type="button" class="scale-btn" onclick="setScale(this,'q_wellbeing','5')">5</button>
+          <button type="button" class="scale-btn" onclick="setScale(this,'q_wellbeing','6')">6</button>
+          <button type="button" class="scale-btn" onclick="setScale(this,'q_wellbeing','7')">7</button>
+          <button type="button" class="scale-btn" onclick="setScale(this,'q_wellbeing','8')">8</button>
+          <button type="button" class="scale-btn" onclick="setScale(this,'q_wellbeing','9')">9</button>
+          <button type="button" class="scale-btn" onclick="setScale(this,'q_wellbeing','10')">10</button>
+        </div>
+        <div class="scale-labels"><span data-en="Very Poor" data-fil="Napakasama">Very Poor</span><span data-en="Excellent" data-fil="Napakagaling">Excellent</span></div>
+        <input type="hidden" id="q_wellbeing_val">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-en="How often do you feel stressed or overwhelmed?" data-fil="Gaano kadalas kang makaramdam ng stress o pagkabahala?">How often do you feel stressed or overwhelmed? <span>*</span></label>
+        <select class="form-select" id="q_stress" required onchange="updateSurveyProgress()">
+          <option value="">Select frequency</option>
+          <option>Rarely (once a month or less)</option>
+          <option>Sometimes (a few times a month)</option>
+          <option>Often (a few times a week)</option>
+          <option>Almost daily</option>
+          <option>Every day</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-en="What are your biggest mental health challenges? (Select all that apply)" data-fil="Ano ang iyong pinakamalalaking hamon sa kalusugang pangkaisipan?">What are your biggest mental health challenges? (Select all that apply)</label>
+        <div class="radio-group" id="q_challenges">
+          <label class="radio-label"><input type="checkbox" name="challenge" value="Anxiety"> Anxiety</label>
+          <label class="radio-label"><input type="checkbox" name="challenge" value="Depression"> Depression</label>
+          <label class="radio-label"><input type="checkbox" name="challenge" value="Stress"> Stress</label>
+          <label class="radio-label"><input type="checkbox" name="challenge" value="Loneliness"> Loneliness</label>
+          <label class="radio-label"><input type="checkbox" name="challenge" value="Burnout"> Burnout</label>
+          <label class="radio-label"><input type="checkbox" name="challenge" value="Grief"> Grief</label>
+          <label class="radio-label"><input type="checkbox" name="challenge" value="None"> None</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-en="Have you ever sought professional mental health support in the Philippines?" data-fil="Naghanap ka na ba ng propesyonal na suporta sa kalusugang pangkaisipan sa Pilipinas?">Have you ever sought professional mental health support in the Philippines? <span>*</span></label>
+        <div class="radio-group" id="q_helpseeking">
+          <label class="radio-label"><input type="radio" name="helpseeking" value="Yes" onchange="updateSurveyProgress()"> Yes</label>
+          <label class="radio-label"><input type="radio" name="helpseeking" value="No" onchange="updateSurveyProgress()"> No</label>
+          <label class="radio-label"><input type="radio" name="helpseeking" value="Wanted to but couldn't" onchange="updateSurveyProgress()"> Wanted to, but couldn't</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-en="What prevents you from seeking mental health support?" data-fil="Ano ang pumipigil sa iyo sa paghahanap ng tulong?">What prevents you from seeking mental health support?</label>
+        <select class="form-select" id="q_barrier" onchange="updateSurveyProgress()">
+          <option value="">Select main barrier (if any)</option>
+          <option>Cost / no funds</option>
+          <option>Stigma / fear of judgment</option>
+          <option>Lack of awareness of services</option>
+          <option>No services available in my area</option>
+          <option>Cultural / family pressure not to seek help</option>
+          <option>I don't feel I need help</option>
+          <option>I already have support</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-en="In your own words: What does mental health mean to you as a Filipino?" data-fil="Sa iyong sariling salita: Ano ang ibig sabihin ng kalusugang pangkaisipan para sa iyo bilang isang Pilipino?">In your own words: What does mental health mean to you as a Filipino?</label>
+        <textarea class="form-textarea" id="q_open" placeholder="Maaari kang magsulat sa Filipino o English…" oninput="updateSurveyProgress()"></textarea>
+      </div>
+
+      <div class="consent-box">
+        <strong data-en="Informed Consent" data-fil="Informed Consent">Informed Consent</strong><br>
+        <span data-en="Your participation is voluntary and anonymous. No identifying information is collected. Responses may be used in academic research and advocacy efforts for Philippine mental health policy. You may stop at any time." data-fil="Ang iyong pakikilahok ay boluntaryo at anonymous. Walang personal na impormasyon ang kinokolekta. Maaari kang huminto anumang oras.">Your participation is voluntary and anonymous. No identifying information is collected. Responses may be used in academic research and advocacy efforts for Philippine mental health policy. You may stop at any time.</span>
+        <div class="consent-check">
+          <input type="checkbox" id="consent" onchange="updateSurveyProgress()" />
+          <label for="consent" style="font-size:0.82rem; color: var(--text);" data-en="I understand and agree to participate in this research survey." data-fil="Naiintindihan ko at sumasang-ayon akong lumahok sa pananaliksik na ito.">I understand and agree to participate in this research survey.</label>
+        </div>
+      </div>
+
+      <button type="button" class="submit-btn" onclick="submitSurvey()" data-en="Submit My Response →" data-fil="Isumite ang Aking Sagot →">Submit My Response →</button>
+    </div>
+
+    <div class="success-msg" id="successMsg">
+      <div class="big-check">🌿</div>
+      <h3 data-en="Salamat sa iyong sagot!" data-fil="Salamat sa iyong sagot!">Salamat sa iyong sagot!</h3>
+      <p data-en="Your response has been recorded. You've contributed to meaningful research that can shape mental health support for Filipinos." data-fil="Naitala na ang iyong sagot. Nag-ambag ka sa makabuluhang pananaliksik para sa mga Pilipino.">Your response has been recorded. You've contributed to meaningful research that can shape mental health support for Filipinos.</p>
+      <br>
+      <p style="font-size:0.85rem; color: var(--teal); font-weight: 600;" data-en="Remember: help is always available. See the Resources section above if you or someone you know needs support." data-fil="Tandaan: laging available ang tulong. Tingnan ang seksyon ng Tulong sa itaas.">Remember: help is always available. See the Resources section above if you or someone you know needs support.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Isip Ko, Mahal Ko</div>
+  <p data-en="A psychology research initiative committed to advancing mental health awareness and support for Filipino communities. Developed as an academic research project in the Philippines." data-fil="Isang inisyatiba sa pananaliksik sa sikolohiya na nakatuon sa pagpapalakas ng kamalayan sa kalusugang pangkaisipan para sa mga komunidad ng Pilipino.">A psychology research initiative committed to advancing mental health awareness and support for Filipino communities. Developed as an academic research project in the Philippines.</p>
+  <div class="disclaimer">
+    This website is for research and awareness purposes only. It is not a substitute for professional mental health care. If you are in crisis, please contact the NCMH Crisis Hotline at <strong style="color:#fff;">1553</strong>.
+    <br><br>
+    In partnership with the spirit of <strong style="color:#fff;">RA 11036 — Philippine Mental Health Act</strong> · © 2025 Psychology Research Project
+  </div>
+</footer>
+
+<script>
+// ══════════════════════════════════════
+// GOOGLE SHEETS URL
+// ══════════════════════════════════════
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzHGszLvh4YAIAH17Qm66L7QA-SnijiVvRPqpKM7mwyOdOcgpZubKwpwAFrTOnwHT0X2w/exec';
+
+// ══════════════════════════════════════
+// LOADING SCREEN
+// ══════════════════════════════════════
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hidden');
+  }, 2200);
+});
+
+// ══════════════════════════════════════
+// DARK MODE
+// ══════════════════════════════════════
+function toggleDark() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('darkBtn').textContent = isDark ? '🌙' : '☀️';
+  // Update chart colors
+  updateChartColors();
+}
+
+// ══════════════════════════════════════
+// LANGUAGE TOGGLE
+// ══════════════════════════════════════
+let currentLang = 'en';
+function toggleLang() {
+  currentLang = currentLang === 'en' ? 'fil' : 'en';
+  document.documentElement.setAttribute('data-lang', currentLang);
+  document.getElementById('langBtn').textContent = currentLang === 'en' ? '🇵🇭 Filipino' : '🇬🇧 English';
+
+  document.querySelectorAll('[data-en][data-fil]').forEach(el => {
+    const val = el.getAttribute('data-' + currentLang);
+    if (val) el.innerHTML = val;
+  });
+}
+
+// ══════════════════════════════════════
+// SCALE BUTTONS (Survey)
+// ══════════════════════════════════════
+const scaleValues = {};
+function setScale(btn, groupId, value) {
+  scaleValues[groupId] = value;
+  document.getElementById(groupId + '_val').value = value;
+  document.getElementById(groupId).querySelectorAll('.scale-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateSurveyProgress();
+}
+
+// ══════════════════════════════════════
+// RADIO / CHECKBOX STYLING
+// ══════════════════════════════════════
+document.addEventListener('change', function(e) {
+  if (e.target.type === 'radio') {
+    const group = e.target.closest('.radio-group');
+    if (!group) return;
+    group.querySelectorAll('.radio-label').forEach(l => l.classList.remove('selected'));
+    e.target.closest('.radio-label').classList.add('selected');
+  }
+  if (e.target.type === 'checkbox' && e.target.closest('.radio-group')) {
+    const lbl = e.target.closest('.radio-label');
+    if (e.target.checked) lbl.classList.add('selected');
+    else lbl.classList.remove('selected');
+  }
+});
+
+// ══════════════════════════════════════
+// SURVEY PROGRESS BAR
+// ══════════════════════════════════════
+function updateSurveyProgress() {
+  const fields = [
+    document.getElementById('q_age').value,
+    document.getElementById('q_region').value,
+    document.querySelector('input[name="status"]:checked')?.value,
+    document.getElementById('q_wellbeing_val').value,
+    document.getElementById('q_stress').value,
+    document.querySelector('input[name="helpseeking"]:checked')?.value,
+    document.getElementById('consent').checked ? 'yes' : ''
+  ];
+  const filled = fields.filter(f => f && f !== '').length;
+  const pct = Math.round((filled / fields.length) * 100);
+  document.getElementById('surveyProgressFill').style.width = pct + '%';
+  document.getElementById('surveyPct').textContent = pct + '%';
+}
+
+// ══════════════════════════════════════
+// SUBMIT SURVEY
+// ══════════════════════════════════════
+async function submitSurvey() {
+  const consent = document.getElementById('consent').checked;
+  if (!consent) { alert('Please check the consent box to proceed.'); return; }
+
+  const age = document.getElementById('q_age').value;
+  const region = document.getElementById('q_region').value;
+  const stress = document.getElementById('q_stress').value;
+  const wellbeing = document.getElementById('q_wellbeing_val').value;
+
+  if (!age || !region || !stress || !wellbeing) {
+    alert('Please answer all required questions (marked with *) before submitting.');
+    return;
+  }
+
+  const data = {
+    timestamp: new Date().toISOString(),
+    age, region, stress, wellbeing,
+    status: document.querySelector('input[name="status"]:checked')?.value || '',
+    challenges: [...document.querySelectorAll('input[name="challenge"]:checked')].map(c => c.value).join(', '),
+    helpseeking: document.querySelector('input[name="helpseeking"]:checked')?.value || '',
+    barrier: document.getElementById('q_barrier').value,
+    open: document.getElementById('q_open').value
+  };
+
+  const btn = document.querySelector('.submit-btn');
+  btn.textContent = 'Submitting…';
+  btn.disabled = true;
+
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    document.getElementById('surveyForm').style.display = 'none';
+    const success = document.getElementById('successMsg');
+    success.style.display = 'block';
+    success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch(err) {
+    alert('Something went wrong. Please check your internet connection and try again.');
+    btn.textContent = currentLang === 'en' ? 'Submit My Response →' : 'Isumite ang Aking Sagot →';
+    btn.disabled = false;
+  }
+}
+
+// ══════════════════════════════════════
+// SELF-CHECK QUIZ
+// ══════════════════════════════════════
+const quizAnswers = {};
+
+function selectQuiz(el, q, score) {
+  el.closest('.quiz-options').querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  quizAnswers[q] = score;
+  document.getElementById('qnext' + q).classList.add('enabled');
+}
+
+function quizNext(q) {
+  if (!quizAnswers[q] && quizAnswers[q] !== 0) return;
+  document.getElementById('qcard' + q).classList.remove('active');
+  const next = q + 1;
+  if (next <= 5) {
+    document.getElementById('qcard' + next).classList.add('active');
+    const pct = (next / 5) * 100;
+    document.getElementById('quizProgressFill').style.width = pct + '%';
+    document.getElementById('quizStepLabel').textContent = 'Question ' + next + ' of 5';
+  }
+}
+
+function quizBack(q) {
+  document.getElementById('qcard' + q).classList.remove('active');
+  document.getElementById('qcard' + (q - 1)).classList.add('active');
+  const pct = ((q - 1) / 5) * 100;
+  document.getElementById('quizProgressFill').style.width = pct + '%';
+  document.getElementById('quizStepLabel').textContent = 'Question ' + (q - 1) + ' of 5';
+}
+
+function showQuizResult() {
+  if (quizAnswers[5] === undefined) return;
+  const total = Object.values(quizAnswers).reduce((a, b) => a + b, 0);
+  const max = 15;
+  const score = total;
+
+  let emoji, title, badge, badgeColor, desc, tips;
+
+  if (score <= 3) {
+    emoji = '🌟'; title = 'You\'re Doing Well!';
+    badge = 'Low Concern'; badgeColor = 'rgba(42,124,111,0.15); color: #2a7c6f;';
+    desc = 'Your responses suggest you\'re in a good place right now. You have solid energy, manageable stress, and support around you. Keep nurturing your mental wellness!';
+    tips = '<h4>Keep it up with these habits</h4><ul><li>Maintain your sleep routine and self-care practices</li><li>Stay connected with your support network</li><li>Practice gratitude and mindfulness daily</li><li>Check in on others who may be struggling</li></ul>';
+  } else if (score <= 7) {
+    emoji = '🌿'; title = 'You\'re Managing, But Watch Out';
+    badge = 'Mild Concern'; badgeColor = 'rgba(201,136,58,0.15); color: #c9883a;';
+    desc = 'You\'re getting by, but there are some signs of stress or low energy. This is very common — especially for Filipinos juggling work, school, and family. Small steps can make a big difference.';
+    tips = '<h4>Helpful steps for you</h4><ul><li>Make time for activities that recharge you</li><li>Talk to someone you trust about how you\'re feeling</li><li>Try to get consistent, quality sleep</li><li>Consider a mental health check-in with a counselor</li></ul>';
+  } else if (score <= 11) {
+    emoji = '🫂'; title = 'You May Need Some Support';
+    badge = 'Moderate Concern'; badgeColor = 'rgba(196,92,58,0.15); color: #c45c3a;';
+    desc = 'Your responses suggest you\'re going through a difficult time. Feelings of anxiety, exhaustion, or sadness are real and valid — and help is available. You don\'t have to face this alone.';
+    tips = '<h4>We encourage you to</h4><ul><li>Reach out to a trusted friend, family member, or counselor</li><li>Contact a mental health hotline — NCMH: 1553</li><li>Be gentle with yourself and take things one day at a time</li><li>Consider professional counseling or therapy</li></ul>';
+  } else {
+    emoji = '💙'; title = 'Please Reach Out for Help';
+    badge = 'High Concern'; badgeColor = 'rgba(224,123,138,0.2); color: #c45c3a;';
+    desc = 'Your responses indicate you may be struggling significantly right now. This takes courage to acknowledge. Please know that support is available and recovery is possible. Huwag kang mag-atubili — you are not alone.';
+    tips = '<h4>Please take these steps today</h4><ul><li><strong>Call NCMH now: 1553</strong> — free, 24/7 crisis support</li><li>Tell someone you trust how you are really feeling</li><li>If in immediate danger, call 911 or go to the nearest ER</li><li>Hopeline: 0917-558-4673 — you can also text or call</li></ul>';
+  }
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultBadge').innerHTML = badge;
+  document.getElementById('resultBadge').style.cssText = 'background:' + badgeColor;
+  document.getElementById('resultDesc').textContent = desc;
+  document.getElementById('resultTips').innerHTML = tips;
+
+  document.getElementById('qcard5').classList.remove('active');
+  document.getElementById('qresult').classList.add('active');
+  document.getElementById('quizProgressFill').style.width = '100%';
+  document.getElementById('quizStepLabel').textContent = 'Complete!';
+}
+
+function retakeQuiz() {
+  Object.keys(quizAnswers).forEach(k => delete quizAnswers[k]);
+  document.querySelectorAll('.quiz-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('.quiz-next-btn').forEach(b => b.classList.remove('enabled'));
+  document.getElementById('qcard1').classList.add('active');
+  document.getElementById('quizProgressFill').style.width = '20%';
+  document.getElementById('quizStepLabel').textContent = 'Question 1 of 5';
+}
+
+// ══════════════════════════════════════
+// DASHBOARD CHARTS
+// ══════════════════════════════════════
+const isDark = () => document.documentElement.getAttribute('data-theme') === 'dark';
+const chartColor = () => isDark() ? 'rgba(255,255,255,0.7)' : '#2c3e35';
+const gridColor = () => isDark() ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+
+// Sample data (updates when real responses come in)
+const sampleData = {
+  totalResponses: 47,
+  avgWellbeing: '6.2',
+  topChallenge: 'Stress',
+  stress: [4, 8, 15, 12, 8],
+  helpseeking: [12, 28, 7],
+  barriers: [18, 14, 8, 6, 10, 5, 4]
+};
+
+// Animate counter
+function animateCount(el, end, suffix = '') {
+  let start = 0;
+  const duration = 1500;
+  const step = (end / duration) * 16;
+  const timer = setInterval(() => {
+    start += step;
+    if (start >= end) { el.textContent = end.toLocaleString() + suffix; clearInterval(timer); }
+    else el.textContent = Math.floor(start).toLocaleString() + suffix;
+  }, 16);
+}
+
+let chartsInitialized = false;
+let stressChartInst, helpChartInst, barrierChartInst;
+
+function initDashboard() {
+  if (chartsInitialized) return;
+  chartsInitialized = true;
+
+  animateCount(document.getElementById('totalResponses'), sampleData.totalResponses);
+  document.getElementById('avgWellbeing').textContent = sampleData.avgWellbeing;
+  document.getElementById('topChallenge').textContent = sampleData.topChallenge;
+
+  const teal = '#2a7c6f'; const gold = '#c9883a'; const rust = '#c45c3a';
+  const colors = [teal, gold, rust, '#7b68ee', '#4caf82'];
+
+  stressChartInst = new Chart(document.getElementById('stressChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Rarely', 'Sometimes', 'Often', 'Almost Daily', 'Every Day'],
+      datasets: [{ data: sampleData.stress, backgroundColor: colors, borderRadius: 8, borderSkipped: false }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { ticks: { color: chartColor() }, grid: { color: gridColor() } },
+        x: { ticks: { color: chartColor() }, grid: { display: false } }
+      }
+    }
+  });
+
+  helpChartInst = new Chart(document.getElementById('helpChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Yes', 'No', 'Wanted to'],
+      datasets: [{ data: sampleData.helpseeking, backgroundColor: [teal, '#d8e8e4', gold], borderWidth: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { color: chartColor(), padding: 16, font: { size: 11 } } } }
+    }
+  });
+
+  barrierChartInst = new Chart(document.getElementById('barrierChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Cost', 'Stigma', 'Awareness', 'No services', 'Family pressure', 'Not needed', 'Have support'],
+      datasets: [{ data: sampleData.barriers, backgroundColor: teal, borderRadius: 6 }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: chartColor() }, grid: { color: gridColor() } },
+        y: { ticks: { color: chartColor() }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+function updateChartColors() {
+  [stressChartInst, helpChartInst, barrierChartInst].forEach(chart => {
+    if (!chart) return;
+    if (chart.options.scales?.x) chart.options.scales.x.ticks.color = chartColor();
+    if (chart.options.scales?.y) chart.options.scales.y.ticks.color = chartColor();
+    if (chart.options.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = chartColor();
+    chart.update();
+  });
+}
+
+// ══════════════════════════════════════
+// SCROLL REVEAL + DASHBOARD TRIGGER
+// ══════════════════════════════════════
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.animation = 'fadeUp 0.6s ease both';
+      e.target.style.opacity = 1;
+      if (e.target.closest('#dashboard')) initDashboard();
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.awareness-card, .hotline-card, .dash-card').forEach(el => {
+  el.style.opacity = 0;
+  observer.observe(el);
+});
+
+// Trigger dashboard if already in view
+const dashSection = document.getElementById('dashboard');
+const dashObserver = new IntersectionObserver((entries) => {
+  if (entries[0].isIntersecting) { initDashboard(); dashObserver.disconnect(); }
+}, { threshold: 0.1 });
+dashObserver.observe(dashSection);
+</script>
+</body>
+</html>
